@@ -1,7 +1,8 @@
 name: Python Script Test
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: "30 17 * * *"
 
 jobs:
   test:
