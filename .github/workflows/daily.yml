@@ -1,43 +1,35 @@
-name: Phase 1 - Lyfta Fetch Daily
+name: Daily Workout Pipeline
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # 11 PM UTC daily; adjust for timezone (e.g., '0 4 * * *' for 11 PM EST)
-  workflow_dispatch:  # Manual trigger for testing
+    - cron: "30 17 * * *" # 11:00 PM IST
+  workflow_dispatch:
 
 jobs:
-  fetch:
+  run:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # For committing logs
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install requests
 
-      - name: Run fetch script
-        env:
-          LYFTA_API_KEY: ${{ secrets.LYFTA_API_KEY }}
+      - name: Fetch workout data
         run: |
-          python scripts/phase1_fetch.py > logs/fetch_$(date +%Y-%m-%d).json 2>&1 || echo "Error occurred; check logs"
-          mkdir -p logs  # Ensure logs dir exists
+          python scripts/fetch_workout.py
 
-      - name: Commit fetch log
+      - name: Store workout in SQLite
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add logs/fetch_*.json || true
-          if git diff --staged --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Log Phase 1 fetch for $(date +%Y-%m-%d)"
-            git push
-          fi
+          python scripts/store_workout.py
+
+      - name: List files (debug)
+        run: |
+          ls -la
