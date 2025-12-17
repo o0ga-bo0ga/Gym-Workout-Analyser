@@ -12,14 +12,34 @@ def main():
         print("PHASE1 RESULT: Rest day (no workout logged today)")
         return
 
-    title = workout.get("title", "Untitled")
-    volume = workout.get("total_volume", "N/A")
-    date = workout.get("workout_perform_date", "unknown")
-
     print("PHASE1 RESULT: Workout detected today")
-    print(f"Title: {title}")
-    print(f"Date: {date}")
-    print(f"Total volume: {volume}")
+    print(f"Title: {workout.get('title')}")
+    print(f"Date: {workout.get('workout_perform_date')}")
+    print(f"Total volume: {workout.get('total_volume')}")
+    print("")
+
+    exercises = workout.get("exercises", [])
+    print(f"Exercises count: {len(exercises)}")
+    print("-" * 40)
+
+    for ex in exercises:
+        name = ex.get("excercise_name")
+        ex_type = ex.get("exercise_type")
+
+        print(f"Exercise: {name} ({ex_type})")
+
+        sets = ex.get("sets", [])
+        for idx, s in enumerate(sets, start=1):
+            weight = s.get("weight")
+            reps = s.get("reps")
+            completed = s.get("is_completed")
+
+            print(
+                f"  Set {idx}: {weight} x {reps} "
+                f"{'(completed)' if completed else '(not completed)'}"
+            )
+
+        print("")
 
 if __name__ == "__main__":
     main()
