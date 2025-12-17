@@ -32,11 +32,9 @@ def main():
         for idx, s in enumerate(sets, start=1):
             weight = s.get("weight")
             reps = s.get("reps")
-            completed = s.get("is_completed")
 
             print(
-                f"  Set {idx}: {weight} x {reps} "
-                f"{'(completed)' if completed else '(not completed)'}"
+                f"  Set {idx}: {weight} kg x {reps} "
             )
 
         print("")
