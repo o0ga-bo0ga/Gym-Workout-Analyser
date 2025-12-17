@@ -1,18 +1,29 @@
-name: Python Script Test
+name: Daily Workout
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: "30 17 * * *"
+    - cron: "30 17 * * *"  # 11 PM IST
 
 jobs:
-  test:
+  run:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Run script
-        run: python scripts/fetch_workout.py
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run workflow
+        env:
+          LYFTA_API_KEY: ${{ secrets.LYFTA_API_KEY }}
+        run: |
+          python scripts/run.py
