@@ -1,0 +1,29 @@
+name: Phase 1 - Lyfta Fetch
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 20 * * *"   # adjust later
+
+jobs:
+  phase1:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Phase 1
+        env:
+          LYFTA_API_KEY: ${{ secrets.LYFTA_API_KEY }}
+        run: |
+          python src/phase1.py
