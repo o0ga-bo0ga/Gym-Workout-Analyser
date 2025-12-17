@@ -7,7 +7,7 @@ def get_connection():
     db_url = os.environ.get("SUPABASE_DATABASE_URL")
     if not db_url:
         raise RuntimeError("SUPABASE_DATABASE_URL not set")
-    return psycopg2.connect(db_url)
+    return psycopg2.connect(db_url, sslmode='require')
 
 def init_db():
     with get_connection() as con:
