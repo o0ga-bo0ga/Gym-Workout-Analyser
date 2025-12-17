@@ -1,0 +1,29 @@
+name: Phase 3 - History Summary
+
+on:
+  workflow_dispatch:
+
+jobs:
+  phase3:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Download DB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: workouts-db
+          path: data
+
+      - name: Run Phase 3
+        run: |
+          python src/phase3.py
