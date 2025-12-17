@@ -1,10 +1,12 @@
-name: Phase 3 - History Summary
+name: Daily Workout Pipeline
 
 on:
+  schedule:
+    - cron: "30 20 * * *"
   workflow_dispatch:
 
 jobs:
-  phase3:
+  run:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,12 +20,8 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Download DB artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: workouts-db
-          path: data
-
-      - name: Run Phase 3
+      - name: Run pipeline
+        env:
+          LYFTA_API_KEY: ${{ secrets.LYFTA_API_KEY }}
         run: |
-          python src/phase3.py
+          python src/main.py
