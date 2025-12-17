@@ -2,6 +2,7 @@ import os
 import json
 import psycopg2
 from psycopg2.extras import Json
+from phase2 import build_workout_description
 
 def get_connection():
     db_url = os.environ.get("SUPABASE_DATABASE_URL")
@@ -37,11 +38,15 @@ def log_rest_day(workout_date):
             """, (workout_date,))
         con.commit()
 
+
 def log_workout(workout):
     workout_date = workout["workout_perform_date"][:10]
+
     exercises = workout.get("exercises", [])
     exercise_count = len(exercises)
     set_count = sum(len(ex.get("sets", [])) for ex in exercises)
+
+    description = build_workout_description(workout)
 
     with get_connection() as con:
         with con.cursor() as cur:
@@ -53,7 +58,7 @@ def log_workout(workout):
                 total_volume,
                 exercise_count,
                 set_count,
-                raw_json,
+                description,
                 is_rest_day
             )
             VALUES (%s, %s, %s, %s, %s, %s, %s, FALSE)
@@ -65,6 +70,6 @@ def log_workout(workout):
                 workout.get("total_volume"),
                 exercise_count,
                 set_count,
-                Json(workout)
+                Json(description)
             ))
         con.commit()
