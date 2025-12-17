@@ -2,7 +2,7 @@ import os
 import json
 import psycopg2
 from psycopg2.extras import Json
-from phase2 import build_workout_description
+from transform import build_workout_description
 
 def get_connection():
     db_url = os.environ.get("SUPABASE_DATABASE_URL")
