@@ -1,64 +1,70 @@
-import sqlite3
+import os
 import json
-from pathlib import Path
-
-DB_PATH = Path("data/workouts.db")
+import psycopg2
+from psycopg2.extras import Json
 
 def get_connection():
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    return sqlite3.connect(DB_PATH)
+    db_url = os.environ.get("SUPABASE_DATABASE_URL")
+    if not db_url:
+        raise RuntimeError("SUPABASE_DATABASE_URL not set")
+    return psycopg2.connect(db_url)
 
 def init_db():
     with get_connection() as con:
-        con.execute("""
-        CREATE TABLE IF NOT EXISTS workouts (
-            workout_date TEXT PRIMARY KEY,
-            workout_id INTEGER,
-            title TEXT,
-            total_volume INTEGER,
-            exercise_count INTEGER,
-            set_count INTEGER,
-            raw_json TEXT,
-            is_rest_day INTEGER NOT NULL,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-        """)
+        with con.cursor() as cur:
+            cur.execute("""
+            CREATE TABLE IF NOT EXISTS workouts (
+                workout_date DATE PRIMARY KEY,
+                workout_id INTEGER,
+                title TEXT,
+                total_volume INTEGER,
+                exercise_count INTEGER,
+                set_count INTEGER,
+                raw_json JSONB,
+                is_rest_day BOOLEAN NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW()
+            );
+            """)
+        con.commit()
 
 def log_rest_day(workout_date):
     with get_connection() as con:
-        con.execute("""
-        INSERT OR IGNORE INTO workouts
-        (workout_date, is_rest_day)
-        VALUES (?, 1)
-        """, (workout_date,))
+        with con.cursor() as cur:
+            cur.execute("""
+            INSERT INTO workouts (workout_date, is_rest_day)
+            VALUES (%s, TRUE)
+            ON CONFLICT (workout_date) DO NOTHING;
+            """, (workout_date,))
+        con.commit()
 
 def log_workout(workout):
     workout_date = workout["workout_perform_date"][:10]
-
     exercises = workout.get("exercises", [])
     exercise_count = len(exercises)
     set_count = sum(len(ex.get("sets", [])) for ex in exercises)
 
     with get_connection() as con:
-        con.execute("""
-        INSERT OR IGNORE INTO workouts
-        (
-            workout_date,
-            workout_id,
-            title,
-            total_volume,
-            exercise_count,
-            set_count,
-            raw_json,
-            is_rest_day
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, 0)
-        """, (
-            workout_date,
-            workout.get("id"),
-            workout.get("title"),
-            workout.get("total_volume"),
-            exercise_count,
-            set_count,
-            json.dumps(workout)
-        ))
+        with con.cursor() as cur:
+            cur.execute("""
+            INSERT INTO workouts (
+                workout_date,
+                workout_id,
+                title,
+                total_volume,
+                exercise_count,
+                set_count,
+                raw_json,
+                is_rest_day
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, FALSE)
+            ON CONFLICT (workout_date) DO NOTHING;
+            """, (
+                workout_date,
+                workout.get("id"),
+                workout.get("title"),
+                workout.get("total_volume"),
+                exercise_count,
+                set_count,
+                Json(workout)
+            ))
+        con.commit()

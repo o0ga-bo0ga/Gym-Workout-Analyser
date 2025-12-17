@@ -23,5 +23,6 @@ jobs:
       - name: Run pipeline
         env:
           LYFTA_API_KEY: ${{ secrets.LYFTA_API_KEY }}
+          SUPABASE_DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
         run: |
           python src/main.py
