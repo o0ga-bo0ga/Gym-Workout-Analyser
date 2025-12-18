@@ -77,6 +77,7 @@ Constraints:
 - Be concise and practical
 - No motivational fluff
 - No disclaimers
+- Days not listed in the history should be treated as rest days.
 
 Today's workout:
 {today_workout}
