@@ -13,7 +13,7 @@ def analyze_workout(today_workout, history):
     prompt = build_prompt(today_workout, history)
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.5-flash-lite",
         contents=prompt
     )
 
