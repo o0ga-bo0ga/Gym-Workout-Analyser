@@ -135,11 +135,11 @@ LLM analysis is optional and controlled entirely via configuration.
 ### Modes
 
 ```bash
-GEMINI_MODE=mock | real
+GEMINI_MODE=False| True
 ```
 
-* `mock`: Returns a fixed analysis response (default)
-* `real`: Calls the Gemini API
+* `False`: Returns a fixed analysis response (default, for testing)
+* `True`: Calls the Gemini API
 
 LLM failures (rate limits, overloads, network issues) do not interrupt the pipeline.
 
