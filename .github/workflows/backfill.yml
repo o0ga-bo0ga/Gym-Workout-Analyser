@@ -1,0 +1,35 @@
+name: Backfill Historical Workouts
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "How many days of history to backfill"
+        required: false
+        default: "365"
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+
+    env:
+      LYFTA_API_KEY: ${{ secrets.LYFTA_API_KEY }}
+      SUPABASE_DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+      BACKFILL_DAYS: ${{ github.event.inputs.days }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run backfill
+        run: |
+          python src/backfill.py
