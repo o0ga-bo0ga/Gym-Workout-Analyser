@@ -24,5 +24,6 @@ jobs:
         env:
           LYFTA_API_KEY: ${{ secrets.LYFTA_API_KEY }}
           SUPABASE_DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python src/main.py

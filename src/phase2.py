@@ -1,8 +1,12 @@
 from datetime import date
 from db import init_db, log_rest_day, log_workout, enforce_retention
 from log import info
+from config import DRY_RUN
 
 def persist_today(workout):
+    if DRY_RUN:
+        info("DRY RUN: Skipping DB write")
+        return
     init_db()
     today = date.today().isoformat()
 

@@ -87,3 +87,37 @@ def enforce_retention(months=12):
             """, (f"{months} months",))
         con.commit()
 
+def fetch_recent_workouts(days=28):
+    """
+    Returns recent workouts (excluding rest days),
+    ordered from oldest -> newest.
+    """
+    with get_connection() as con:
+        with con.cursor() as cur:
+            cur.execute("""
+                SELECT
+                    workout_date,
+                    title,
+                    total_volume,
+                    exercise_count,
+                    set_count,
+                    description
+                FROM workouts
+                WHERE
+                    is_rest_day = FALSE
+                    AND workout_date >= CURRENT_DATE - INTERVAL %s
+                ORDER BY workout_date ASC;
+            """, (f"{days} days",))
+            rows = cur.fetchall()
+
+    return [
+        {
+            "date": r[0].isoformat(),
+            "title": r[1],
+            "total_volume": r[2],
+            "exercise_count": r[3],
+            "set_count": r[4],
+            "description": r[5],
+        }
+        for r in rows
+    ]
