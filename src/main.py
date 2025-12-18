@@ -5,6 +5,7 @@ from config import LYFTA_ENABLED, DB_ENABLED, ANALYSIS_ENABLED
 from phase1 import fetch_today
 from phase2 import persist_today
 from phase3 import summarize_last_21_days
+from discord import send_discord_message, format_discord_message
 
 def main():
     info("=== Daily Workout Pipeline Start ===")
@@ -30,10 +31,18 @@ def main():
             history = fetch_recent_workouts(days=28)
             info(f"GEMINI TEST: history workouts = {len(history)}")
             analysis = analyze_workout(workout, history)
-            info("GEMINI ANALYSIS")
+            message = format_discord_message(analysis, workout)
+            send_discord_message(message)
+            info("Discord report sent")
             print(analysis)
         except Exception as e:
-            warn(f"Gemini analysis failed: {e}")
+            warn(f"Gemini analysis or Discord send failed: {e}")
+    else:
+        try:
+            send_discord_message("YOU TOOK A REST YOU FUCKING BITCH!!!????")
+            info("Rest Day reported")
+        except Exception as e:
+            warm(f"Rest day Discord send failed: {e}")
 
     info("=== Pipeline Complete ===")
 
