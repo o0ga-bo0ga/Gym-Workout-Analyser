@@ -73,3 +73,17 @@ def log_workout(workout):
                 Json(description)
             ))
         con.commit()
+
+def enforce_retention(months=12):
+    """
+    Delete workouts older than `months`.
+    Safe to run multiple times.
+    """
+    with get_connection() as con:
+        with con.cursor() as cur:
+            cur.execute("""
+                DELETE FROM workouts
+                WHERE workout_date < CURRENT_DATE - INTERVAL %s;
+            """, (f"{months} months",))
+        con.commit()
+
