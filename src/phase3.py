@@ -1,5 +1,6 @@
 import os
 import psycopg2
+from log import info
 
 def summarize_last_21_days():
     db_url = os.environ.get("SUPABASE_DATABASE_URL")
@@ -41,8 +42,8 @@ def summarize_last_21_days():
         "avg_sets": round(avg_sets, 2),
     }
 
-    print("PHASE3: Last 21 days summary")
+    info("PHASE3: Last 21 days summary")
     for k, v in summary.items():
-        print(f"  {k}: {v}")
+        info(f"  {k}: {v}")
 
     return summary
