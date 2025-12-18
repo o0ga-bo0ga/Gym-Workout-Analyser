@@ -7,5 +7,5 @@ LYFTA_ENABLED = env_bool("LYFTA_ENABLED", True)
 DB_ENABLED = env_bool("DB_ENABLED", True)
 RETENTION_ENABLED = env_bool("RETENTION_ENABLED", True)
 ANALYSIS_ENABLED = env_bool("ANALYSIS_ENABLED", True)  # Gemini later
-GEMINI_MODE = env_bool("GEMINI_MODE", False)  #True for yes
+GEMINI_MODE = env_bool("GEMINI_MODE", "mock")  # "real" or "mock"
 DRY_RUN = env_bool("DRY_RUN", False)

@@ -4,7 +4,7 @@ from log import info
 
 
 def analyze_workout(today_workout, history):
-    if GEMINI_MODE == "mock":
+    if not GEMINI_MODE:
         info("GEMINI: Using mock response")
         return mock_response(today_workout, history)
 
