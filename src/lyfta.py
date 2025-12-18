@@ -1,5 +1,5 @@
 import requests
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from time import sleep
 
 BASE_URL = "https://my.lyfta.app"
