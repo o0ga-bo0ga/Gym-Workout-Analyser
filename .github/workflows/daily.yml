@@ -2,7 +2,7 @@ name: Daily Workout Pipeline
 
 on:
   schedule:
-    - cron: "35 6 * * *"
+    - cron: "30 16 * * *"
   workflow_dispatch:
 
 jobs:
