@@ -78,7 +78,7 @@ Constraints:
 - No motivational fluff
 - No disclaimers
 - Days not listed in the history should be treated as rest days.
-- Keep the response under 2000 characters. This is very important.
+- Keep the response under 1800 characters. This is very important as if it exceeds 2000 characters the discord messaging will fail.
 
 Today's workout:
 {today_workout}
