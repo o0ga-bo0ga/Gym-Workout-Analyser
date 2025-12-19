@@ -78,6 +78,7 @@ Constraints:
 - No motivational fluff
 - No disclaimers
 - Days not listed in the history should be treated as rest days.
+- Keep the response under 2000 characters. This is very important.
 
 Today's workout:
 {today_workout}
