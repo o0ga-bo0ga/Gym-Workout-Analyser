@@ -27,47 +27,45 @@ def build_prompt(today_workout, history):
 You are a strength training and hypertrophy coach.Following is my workout plan:
 
 MONDAY — Upper Body Strength
-
-1. Flat Dumbbell Bench Press
-2. Bent-Over Dumbbell Rows (Heavy)
-3. Single-Arm Dumbbell Row (Bench Supported)
-4. Seated Dumbbell Overhead Press
-5. Lat Pulldown (Wide Grip)
-6. Dumbbell Skullcrushers
+    1.Incline Dumbbell Bench Press
+    2.Wide-Grip Lat Pulldown
+    3.Seated Cable Row
+    4.Dumbbell Lateral Raises
+    5.Face Pulls
 
 TUESDAY — Lower Body Strength (Deadlift-free & glute bridge skipped)
-
-1. Heavy Goblet Squats
-2. Leg Curl Machine
-3. Heel-Elevated Dumbbell Squats OR Leg Press
-4. Standing Calf Raises (Holding Dumbbell)
+    1.Goblet Squats
+    2.Leg Press
+    3.Walking Dumbbell Lunges
+    4.Seated Leg Curl
+    5.Standing Calf Raises
 
 WEDNESDAY — REST
 
-THURSDAY — Push Hypertrophy
+THURSDAY — Chest+Tricep
+    1.Incline Dumbbell Bench Press
+    2.Cable Fly (High → Low)
+    3.Pec Deck
+    4.Cable Pushdowns
+    5.Overhead Cable Triceps Extensions
 
-1. Incline Dumbbell Press (30°)
-2. Dumbbell Lateral Raises
-3. Flat Dumbbell Flyes (or DB Press)
-4. Arnold Press / Light Shoulder Press
-5. Rope Tricep Pushdowns
+FRIDAY — Back+Bicep
+    1.Lat Pulldown (Neutral or Close Grip)
+    2.Chest-Supported Dumbbell Row
+    3.Single-Arm Cable Row
+    4.Wide-Grip Seated Cable Row (elbows flared)
+    5.Incline Dumbbell Curl
+    6.Alternating Dumbbell Curl
+    7.Hammer Curl
 
-FRIDAY — Pull Hypertrophy
-
-1. Lat Pulldown (V-Grip / Neutral)
-2. Single-Arm Dumbbell Row
-3. Face Pulls
-4. Rear Delt Dumbbell Flyes
-5. Standing Dumbbell Curls
-6. Hammer Curls (Wall-Supported)
-
-SATURDAY — Legs Volume (High Rep)
-
-1. Bulgarian Split Squats
-2. Goblet Squats (Volume)
-3. Dumbbell Lunges
-4. Leg Curl Machine
-5. Seated Calf Raises (DBs on knees)
+SATURDAY — Arms+Shoulder
+    1.Seated Dumbbell Shoulder Press
+    2.Dumbbell Lateral Raises
+    3.Cable Lateral Raises
+    4.Rear-Delt Machine Fly
+    5.Rope Triceps Pushdowns
+    6.Overhead Rope Extensions
+    7.Preacher Curl Machine
 
 SUNDAY — REST
 
@@ -78,6 +76,8 @@ Constraints:
 - No motivational fluff
 - No disclaimers
 - Days not listed in the history should be treated as rest days.
+- If you see any weird rep ranges, just know that I tried going to failure, because thats what I'm gonna do regardless of weight chosen, I'm gonna pursue failure on the end sets
+- Every workout will have the muscle worked in the title, that is, it will have upper, lower/legs, chest tri, back bi, arms shoulder, in the title. please look at that, see which workout i did and then analyse.
 - Keep the response under 1800 characters. This is very important as if it exceeds 2000 characters the discord messaging will fail.
 
 Today's workout:
