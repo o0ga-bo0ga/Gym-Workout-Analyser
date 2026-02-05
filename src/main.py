@@ -42,7 +42,7 @@ def main():
             send_discord_message("YOU TOOK A REST YOU FUCKING BITCH!!!????")
             info("Rest Day reported")
         except Exception as e:
-            warm(f"Rest day Discord send failed: {e}")
+            warn(f"Rest day Discord send failed: {e}")
 
     info("=== Pipeline Complete ===")
 
