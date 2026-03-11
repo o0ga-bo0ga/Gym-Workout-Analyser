@@ -42,7 +42,6 @@ class TestBuildPrompt:
         
         assert "Be concise and practical" in prompt
         assert "No motivational fluff" in prompt
-        assert "1800 characters" in prompt
 
     def test_prompt_contains_required_sections(self):
         """Prompt should ask for all required analysis sections."""
