@@ -1,9 +1,19 @@
 import datetime
+from datetime import timezone
 
-def log(level, msg):
-    ts = datetime.datetime.utcnow().isoformat(timespec="seconds")
+
+def log(level: str, msg: str) -> None:
+    ts = datetime.datetime.now(timezone.utc).isoformat(timespec="seconds")
     print(f"[{ts}] [{level}] {msg}")
 
-def info(msg): log("INFO", msg)
-def warn(msg): log("WARN", msg)
-def error(msg): log("ERROR", msg)
+
+def info(msg: str) -> None:
+    log("INFO", msg)
+
+
+def warn(msg: str) -> None:
+    log("WARN", msg)
+
+
+def error(msg: str) -> None:
+    log("ERROR", msg)

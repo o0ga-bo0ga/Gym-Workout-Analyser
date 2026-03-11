@@ -1,16 +1,23 @@
 import os
-import json
+from typing import Any
+
 import psycopg2
+from psycopg2 import extensions
 from psycopg2.extras import Json
+
 from transform import build_workout_description
 
-def get_connection():
+
+def get_connection() -> extensions.connection:
+    """Get a database connection to Supabase Postgres."""
     db_url = os.environ.get("SUPABASE_DATABASE_URL")
     if not db_url:
         raise RuntimeError("SUPABASE_DATABASE_URL not set")
     return psycopg2.connect(db_url, sslmode='require')
 
-def init_db():
+
+def init_db() -> None:
+    """Initialize the workouts table if it doesn't exist."""
     with get_connection() as con:
         with con.cursor() as cur:
             cur.execute("""
@@ -21,14 +28,16 @@ def init_db():
                 total_volume INTEGER,
                 exercise_count INTEGER,
                 set_count INTEGER,
-                raw_json JSONB,
+                description JSONB,
                 is_rest_day BOOLEAN NOT NULL,
                 created_at TIMESTAMP DEFAULT NOW()
             );
             """)
         con.commit()
 
-def log_rest_day(workout_date):
+
+def log_rest_day(workout_date: str) -> None:
+    """Log a rest day to the database."""
     with get_connection() as con:
         with con.cursor() as cur:
             cur.execute("""
@@ -39,7 +48,8 @@ def log_rest_day(workout_date):
         con.commit()
 
 
-def log_workout(workout):
+def log_workout(workout: dict[str, Any]) -> None:
+    """Log a workout to the database."""
     workout_date = workout["workout_perform_date"][:10]
 
     exercises = workout.get("exercises", [])
@@ -74,7 +84,8 @@ def log_workout(workout):
             ))
         con.commit()
 
-def enforce_retention(months=12):
+
+def enforce_retention(months: int = 12) -> None:
     """
     Delete workouts older than `months`.
     Safe to run multiple times.
@@ -87,7 +98,8 @@ def enforce_retention(months=12):
             """, (f"{months} months",))
         con.commit()
 
-def fetch_recent_workouts(days=28):
+
+def fetch_recent_workouts(days: int = 28) -> list[dict[str, Any]]:
     """
     Returns recent workouts (excluding rest days),
     ordered from oldest -> newest.
