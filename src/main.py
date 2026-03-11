@@ -127,7 +127,7 @@ def run_pipeline(services: PipelineServices, settings: PipelineSettings) -> None
     else:
         warn("DB disabled, skipping persistence")
 
-    if settings.analysis_enabled and workout is not None:
+    if workout is not None and settings.analysis_enabled:
         try:
             history = services.fetch_recent_workouts(settings.history_window_days)
             info(f"GEMINI: history workouts = {len(history)}")
@@ -138,6 +138,8 @@ def run_pipeline(services: PipelineServices, settings: PipelineSettings) -> None
             print(analysis)
         except Exception as exc:
             warn(f"Gemini analysis or Discord send failed: {exc}")
+    elif workout is not None:
+        info("Analysis disabled, skipping workout report")
     else:
         try:
             services.send_discord_message(settings.rest_day_message)
