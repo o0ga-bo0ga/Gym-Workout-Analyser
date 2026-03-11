@@ -1,11 +1,20 @@
-import requests
-from datetime import date, datetime, timedelta
+from datetime import date
 from time import sleep
+from typing import Any
+
+import requests
+
+from config import LYFTA_TIMEOUT_SECONDS
 
 BASE_URL = "https://my.lyfta.app"
 
-def get_todays_workout(api_key):
-    for attempt in (1,2):
+
+def get_todays_workout(api_key: str) -> dict[str, Any] | None:
+    """
+    Fetch today's workout from Lyfta API.
+    Returns None if no workout found for today (rest day).
+    """
+    for attempt in (1, 2):
         try:
             headers = {
                 "Authorization": f"Bearer {api_key}"
@@ -20,7 +29,7 @@ def get_todays_workout(api_key):
                 f"{BASE_URL}/api/v1/workouts",
                 headers=headers,
                 params=params,
-                timeout=10
+                timeout=LYFTA_TIMEOUT_SECONDS
             )
 
             if resp.status_code != 200:
@@ -41,7 +50,9 @@ def get_todays_workout(api_key):
                 return latest
 
             return None
-        except requests.RequestException as e:
+        except requests.RequestException as exc:
             if attempt == 2:
-                raise
+                raise RuntimeError(f"Lyfta request failed after retry: {exc}") from exc
             sleep(2)
+    
+    return None

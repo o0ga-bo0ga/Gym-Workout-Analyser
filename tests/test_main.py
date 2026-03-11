@@ -90,6 +90,7 @@ def test_run_pipeline_rest_day_message_sent():
         lyfta_enabled=True,
         db_enabled=True,
         analysis_enabled=True,
+        history_window_days=28,
         rest_day_message="rest msg",
     )
 
@@ -106,7 +107,12 @@ def test_run_pipeline_db_failure_raises():
     recorder["persist_raises"] = True
 
     services = _build_services(recorder)
-    settings = PipelineSettings(lyfta_enabled=True, db_enabled=True, analysis_enabled=True)
+    settings = PipelineSettings(
+        lyfta_enabled=True,
+        db_enabled=True,
+        analysis_enabled=True,
+        history_window_days=28,
+    )
 
     with pytest.raises(RuntimeError, match="db down"):
         run_pipeline(services, settings)

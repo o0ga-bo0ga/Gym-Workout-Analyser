@@ -3,23 +3,31 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any, Callable
 
-from config import ANALYSIS_ENABLED, DB_ENABLED, DRY_RUN, LYFTA_ENABLED
+from config import APP_CONFIG, AppConfig
 from log import error, info, warn
 
 Workout = dict[str, Any]
 History = list[dict[str, Any]]
 
 REST_DAY_MESSAGE = "Rest day logged. Recover well and hit the next session hard."
-HISTORY_WINDOW_DAYS = 28
 
 
 @dataclass(frozen=True)
 class PipelineSettings:
-    lyfta_enabled: bool = LYFTA_ENABLED
-    db_enabled: bool = DB_ENABLED
-    analysis_enabled: bool = ANALYSIS_ENABLED
-    history_window_days: int = HISTORY_WINDOW_DAYS
+    lyfta_enabled: bool
+    db_enabled: bool
+    analysis_enabled: bool
+    history_window_days: int
     rest_day_message: str = REST_DAY_MESSAGE
+
+    @classmethod
+    def from_app_config(cls, app_config: AppConfig) -> "PipelineSettings":
+        return cls(
+            lyfta_enabled=app_config.lyfta_enabled,
+            db_enabled=app_config.db_enabled,
+            analysis_enabled=app_config.analysis_enabled,
+            history_window_days=app_config.history_window_days,
+        )
 
 
 @dataclass(frozen=True)
@@ -52,11 +60,17 @@ def fetch_today() -> Workout | None:
     return workout
 
 
-def persist_today(workout: Workout | None) -> None:
+def persist_today(
+    workout: Workout | None,
+    *,
+    dry_run: bool = APP_CONFIG.dry_run,
+    retention_enabled: bool = APP_CONFIG.retention_enabled,
+    retention_months: int = APP_CONFIG.retention_months,
+) -> None:
     """Persist workout or rest day to the database."""
     from db import enforce_retention, init_db, log_rest_day, log_workout
 
-    if DRY_RUN:
+    if dry_run:
         info("DRY RUN: Skipping DB write")
         return
 
@@ -71,11 +85,12 @@ def persist_today(workout: Workout | None) -> None:
         info(f"PHASE2: Workout logged for {today}")
 
     # Retention should never block ingestion.
-    try:
-        enforce_retention(months=12)
-        info("PHASE2: Retention enforced (12 months)")
-    except Exception as exc:
-        info(f"PHASE2 WARNING: Retention failed: {exc}")
+    if retention_enabled:
+        try:
+            enforce_retention(months=retention_months)
+            info(f"PHASE2: Retention enforced ({retention_months} months)")
+        except Exception as exc:
+            info(f"PHASE2 WARNING: Retention failed: {exc}")
 
 
 def build_default_services() -> PipelineServices:
@@ -115,7 +130,7 @@ def run_pipeline(services: PipelineServices, settings: PipelineSettings) -> None
     if settings.analysis_enabled and workout is not None:
         try:
             history = services.fetch_recent_workouts(settings.history_window_days)
-            info(f"GEMINI TEST: history workouts = {len(history)}")
+            info(f"GEMINI: history workouts = {len(history)}")
             analysis = services.analyze_workout(workout, history)
             message = services.format_discord_message(analysis, workout)
             services.send_discord_message(message)
@@ -134,7 +149,7 @@ def run_pipeline(services: PipelineServices, settings: PipelineSettings) -> None
 
 
 def main() -> None:
-    run_pipeline(build_default_services(), PipelineSettings())
+    run_pipeline(build_default_services(), PipelineSettings.from_app_config(APP_CONFIG))
 
 
 if __name__ == "__main__":
