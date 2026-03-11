@@ -3,6 +3,7 @@ from typing import Any
 
 from config import GEMINI_MODE
 from log import info
+from workout_utils import get_exercise_name, parse_weight_reps
 
 NO_HISTORY_MESSAGE = "No workout history available for the last 4 weeks."
 
@@ -52,12 +53,15 @@ def format_workout_for_llm(workout: dict[str, Any]) -> str:
     ]
     
     for i, ex in enumerate(exercises, 1):
-        name = ex.get("excercise_name", "Unknown Exercise")
+        name = get_exercise_name(ex) or "Unknown Exercise"
         lines.append(f"\n{i}. {name}")
         
         for j, s in enumerate(ex.get("sets", []), 1):
-            weight = _to_float(s.get("weight", 0))
-            reps = _to_int(s.get("reps", 0))
+            parsed = parse_weight_reps(s)
+            if parsed is None:
+                weight, reps = 0.0, 0
+            else:
+                weight, reps = parsed
             
             lines.append(f"   Set {j}: {weight:.1f}kg × {reps} reps")
     

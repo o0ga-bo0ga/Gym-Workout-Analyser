@@ -1,6 +1,6 @@
 """Tests for gemini.py - LLM analysis functions."""
 
-from gemini import build_prompt, mock_response
+from gemini import build_prompt, format_workout_for_llm, mock_response
 
 
 class TestBuildPrompt:
@@ -56,6 +56,32 @@ class TestBuildPrompt:
         assert "Good things" in prompt
         assert "Bad things" in prompt
         assert "recommendation" in prompt
+
+
+class TestFormatWorkoutForLlm:
+    """Tests for workout formatting helper."""
+
+    def test_uses_alternate_exercise_name_key(self):
+        workout = {
+            "title": "Upper",
+            "workout_perform_date": "2026-01-01",
+            "exercises": [
+                {"exercise_name": "Incline Press", "sets": [{"weight": 40, "reps": 12}]}
+            ],
+        }
+        text = format_workout_for_llm(workout)
+        assert "Incline Press" in text
+
+    def test_non_numeric_set_values_render_as_zero(self):
+        workout = {
+            "title": "Upper",
+            "workout_perform_date": "2026-01-01",
+            "exercises": [
+                {"excercise_name": "Row", "sets": [{"weight": "bad", "reps": "bad"}]}
+            ],
+        }
+        text = format_workout_for_llm(workout)
+        assert "0.0kg × 0 reps" in text
 
 
 class TestMockResponse:

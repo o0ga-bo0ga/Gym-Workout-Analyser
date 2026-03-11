@@ -1,25 +1,29 @@
-def build_workout_description(workout):
+from typing import Any
+
+from workout_utils import get_exercise_name, parse_weight_reps
+
+
+def build_workout_description(workout: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
     """
     Convert Lyfta workout JSON into a compact, domain-specific structure.
     """
-    description = {}
+    description: dict[str, list[dict[str, Any]]] = {}
 
     for ex in workout.get("exercises", []):
-        name = ex.get("excercise_name")
+        name = get_exercise_name(ex)
         if not name:
             continue
 
-        sets_data = []
+        sets_data: list[dict[str, Any]] = []
         for s in ex.get("sets", []):
-            weight = s.get("weight")
-            reps = s.get("reps")
-
-            if weight is None or reps is None:
+            parsed = parse_weight_reps(s)
+            if parsed is None:
                 continue
+            weight, reps = parsed
 
             sets_data.append({
-                "weight_kg": float(weight),
-                "reps": int(reps)
+                "weight_kg": weight,
+                "reps": reps,
             })
 
         if sets_data:

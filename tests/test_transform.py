@@ -175,3 +175,33 @@ class TestBuildWorkoutDescription:
         
         assert result["Press"][0]["reps"] == 12
         assert isinstance(result["Press"][0]["reps"], int)
+
+    def test_supports_alternate_exercise_name_key(self):
+        """Also supports `exercise_name` key when API spelling differs."""
+        workout = {
+            "exercises": [
+                {
+                    "exercise_name": "Deadlift",
+                    "sets": [{"weight": 120, "reps": 5}]
+                }
+            ]
+        }
+        result = build_workout_description(workout)
+        assert "Deadlift" in result
+
+    def test_skips_non_numeric_set_values(self):
+        """Non-numeric weight/reps values should be skipped, not crash."""
+        workout = {
+            "exercises": [
+                {
+                    "excercise_name": "Row",
+                    "sets": [
+                        {"weight": "bad", "reps": 10},
+                        {"weight": 50, "reps": "also-bad"},
+                        {"weight": 45, "reps": 12},
+                    ],
+                }
+            ]
+        }
+        result = build_workout_description(workout)
+        assert result["Row"] == [{"weight_kg": 45.0, "reps": 12}]
