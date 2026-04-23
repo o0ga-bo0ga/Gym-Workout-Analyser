@@ -206,36 +206,11 @@ class TestGeminiClient:
 
         workout = {"title": "Test"}
         history = None
-        summary = None
 
-        result = mock_response(workout, history, summary)
+        result = mock_response(workout, history)
         assert isinstance(result, str)
         assert len(result) > 0
         assert "Volume" in result
-
-    def test_format_summary_with_data(self):
-        from src.gemini_client import _format_summary
-
-        summary = {
-            "workout_days": 4,
-            "rest_days": 3,
-            "avg_volume": 12000
-        }
-        result = _format_summary(summary)
-        assert "Workout days: 4" in result
-        assert "Rest days: 3" in result
-
-    def test_format_summary_with_none(self):
-        from src.gemini_client import _format_summary
-
-        result = _format_summary(None)
-        assert result == "No data"
-
-    def test_format_summary_with_empty(self):
-        from src.gemini_client import _format_summary
-
-        result = _format_summary({})
-        assert "No data" in result
 
 
 class TestDataFetchEdgeCases:

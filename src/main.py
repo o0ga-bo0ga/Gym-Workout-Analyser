@@ -1,6 +1,5 @@
 import os
 
-from analysis_prep import summarize_last_21_days
 from config import ANALYSIS_ENABLED, DATABASE_ENABLED, DRY_RUN, LYFTA_ENABLED
 from data_fetch import fetch_today_workout
 from database import fetch_recent_workouts
@@ -41,10 +40,9 @@ def main() -> None:
     elif ANALYSIS_ENABLED:
         try:
             history_28_days = fetch_recent_workouts(days=28)
-            summary_21_days = summarize_last_21_days()
-            info(f"GEMINI: history workouts = {len(history_28_days)}, summary = {summary_21_days.get('workout_days', 0)} workout days")
+            info(f"GEMINI: history workouts = {len(history_28_days)}")
 
-            analysis = analyze_workout(workout, history_28_days, summary_21_days)
+            analysis = analyze_workout(workout, history_28_days)
             message = format_discord_message(analysis, workout)
             send_discord_message(message)
             info("Discord report sent")

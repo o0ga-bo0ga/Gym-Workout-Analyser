@@ -4,14 +4,13 @@ from config import GEMINI_MODE
 from log import info, warn
 
 
-def analyze_workout(today_workout, history_28_days=None, summary_21_days=None):
+def analyze_workout(today_workout: dict, history_28_days: list | None = None) -> str:
     if not GEMINI_MODE:
         info("GEMINI: Using mock response")
-        return mock_response(today_workout, history_28_days, summary_21_days)
+        return mock_response(today_workout, history_28_days)
 
     client = genai.Client()
-
-    prompt = build_prompt(today_workout, history_28_days, summary_21_days)
+    prompt = build_prompt(today_workout, history_28_days)
 
     try:
         response = client.models.generate_content(
@@ -24,9 +23,8 @@ def analyze_workout(today_workout, history_28_days=None, summary_21_days=None):
         raise
 
 
-def build_prompt(today_workout, history_28_days=None, summary_21_days=None):
+def build_prompt(today_workout: dict, history_28_days: list | None = None) -> str:
     history_text = history_28_days if history_28_days else "No prior workouts in the last 4 weeks."
-    summary_text = _format_summary(summary_21_days) if summary_21_days else "No summary available."
 
     return f"""
 You are a strength training and hypertrophy coach.Following is my workout plan:
@@ -67,9 +65,6 @@ FRIDAY — Legs
 SATURDAY — REST
 SUNDAY — REST
 
-Last 21 days summary:
-{summary_text}
-
 Analyze today's workout in the context of the past 4 weeks workout data provided.
 
 Constraints:
@@ -97,15 +92,7 @@ Cover:
 """
 
 
-def _format_summary(summary):
-    if not summary:
-        return "No data"
-    return (f"Workout days: {summary.get('workout_days', 0)}, "
-            f"Rest days: {summary.get('rest_days', 0)}, "
-            f"Avg volume: {summary.get('avg_volume', 0):.0f}")
-
-
-def mock_response(today_workout, history_28_days=None, summary_21_days=None):
+def mock_response(today_workout: dict, history_28_days: list | None = None) -> str:
     return """- Volume is stable over the last 4 weeks
 - Exercise selection is balanced but pressing dominates
 - No clear fatigue signals detected
