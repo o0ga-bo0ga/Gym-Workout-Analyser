@@ -50,3 +50,7 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Markdown files (local only)
+*.md
+!README.md
