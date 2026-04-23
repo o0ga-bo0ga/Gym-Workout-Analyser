@@ -1,19 +1,21 @@
 import os
-from lyfta import get_todays_workout
-from log import info
 
-def fetch_today():
+from log import info
+from lyfta_client import fetch_todays_workout
+
+
+def fetch_today_workout() -> dict | None:
     api_key = os.environ.get("LYFTA_API_KEY")
     if not api_key:
         raise RuntimeError("LYFTA_API_KEY not set")
 
-    workout = get_todays_workout(api_key)
+    workout = fetch_todays_workout(api_key)
 
     if workout is None:
-        info("PHASE1: Rest day detected")
+        info("DATA_FETCH: Rest day detected")
         return None
 
-    info("PHASE1: Workout detected")
+    info("DATA_FETCH: Workout detected")
     info(f"  Title: {workout.get('title')}")
     info(f"  Date: {workout.get('workout_perform_date')}")
     info(f"  Exercises: {len(workout.get('exercises', []))}")
