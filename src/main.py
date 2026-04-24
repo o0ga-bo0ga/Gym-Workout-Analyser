@@ -1,10 +1,16 @@
 import os
 
-from config import ANALYSIS_ENABLED, DATABASE_ENABLED, DRY_RUN, LYFTA_ENABLED
+from config import (
+    ANALYSIS_ENABLED,
+    DATABASE_ENABLED,
+    DRY_RUN,
+    LLM_PROVIDER,
+    LYFTA_ENABLED,
+)
 from data_fetch import fetch_today_workout
 from database import fetch_recent_workouts
 from discord_client import format_discord_message, send_discord_message
-from gemini_client import analyze_workout
+from llm_client import analyze_workout
 from log import error, info, warn
 from models import Workout
 from persistence import persist_today_workout
@@ -40,7 +46,7 @@ def main() -> None:
     elif ANALYSIS_ENABLED:
         try:
             history_28_days = fetch_recent_workouts(days=28)
-            info(f"GEMINI: history workouts = {len(history_28_days)}")
+            info(f"{LLM_PROVIDER.upper()}: history workouts = {len(history_28_days)}")
 
             analysis = analyze_workout(workout, history_28_days)
             message = format_discord_message(analysis, workout)

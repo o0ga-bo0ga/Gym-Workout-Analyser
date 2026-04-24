@@ -202,7 +202,7 @@ class TestDatabaseEdgeCases:
 
 class TestGeminiClient:
     def test_mock_response_format(self):
-        from src.gemini_client import mock_response
+        from src.llm_client import mock_response
 
         workout = {"title": "Test"}
         history = None

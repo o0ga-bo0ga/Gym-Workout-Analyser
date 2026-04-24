@@ -1,26 +1,40 @@
-from google import genai
+from groq import Groq
 
-from config import GEMINI_MODE
+from config import LLM_MOCK, LLM_MODEL, LLM_PROVIDER
 from log import info, warn
 
 
 def analyze_workout(today_workout: dict, history_28_days: list | None = None) -> str:
-    if not GEMINI_MODE:
-        info("GEMINI: Using mock response")
+    if LLM_MOCK:
+        info(f"{LLM_PROVIDER.upper()}: Using mock response")
         return mock_response(today_workout, history_28_days)
 
-    client = genai.Client()
+    client = Groq(api_key=get_api_key())
+
     prompt = build_prompt(today_workout, history_28_days)
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
-            contents=prompt
+        response = client.chat.completions.create(
+            model=LLM_MODEL,
+            messages=[{"role": "user", "content": prompt}]
         )
-        return response.text
+        return response.choices[0].message.content
     except Exception as e:
-        warn(f"Gemini API call failed: {e}")
+        warn(f"LLM API call failed: {e}")
         raise
+
+
+def get_api_key() -> str:
+    import os
+
+    provider = LLM_PROVIDER.lower()
+    if provider == "groq":
+        key = os.environ.get("GROQ_API_KEY")
+        if not key:
+            raise RuntimeError("GROQ_API_KEY not set")
+        return key
+    else:
+        raise ValueError(f"Unknown LLM provider: {provider}")
 
 
 def build_prompt(today_workout: dict, history_28_days: list | None = None) -> str:

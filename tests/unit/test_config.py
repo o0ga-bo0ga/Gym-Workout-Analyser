@@ -52,10 +52,10 @@ class TestConfigDefaults:
         reload(src.config)
         assert src.config.DATABASE_ENABLED is True
 
-    def test_gemini_mode_default(self, monkeypatch):
-        monkeypatch.delenv("GEMINI_MODE", raising=False)
+    def test_llm_mock_default(self, monkeypatch):
+        monkeypatch.delenv("LLM_MOCK", raising=False)
         from importlib import reload
 
         import src.config
         reload(src.config)
-        assert src.config.GEMINI_MODE is True
+        assert src.config.LLM_MOCK is False
