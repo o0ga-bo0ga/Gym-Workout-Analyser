@@ -1,32 +1,48 @@
-from groq import Groq
+import os
 
-from config import LLM_MOCK, LLM_MODEL, LLM_PROVIDER
+if os.environ.get("LANGSMITH_ENABLED", "true").lower() in ("1", "true", "yes"):
+    os.environ["LANGSMITH_TRACING"] = "true"
+
+from langchain_groq import ChatGroq
+from langsmith import traceable
+
+from config import LANGSMITH_ENABLED, LLM_ENABLED, LLM_MOCK, LLM_MODEL, LLM_PROVIDER
 from log import info, warn
 
 
 def analyze_workout(today_workout: dict, history_28_days: list | None = None) -> str:
-    if LLM_MOCK:
+    if LLM_ENABLED and not LLM_MOCK:
+        return _analyze_with_llm(today_workout, history_28_days)
+    else:
         info(f"{LLM_PROVIDER.upper()}: Using mock response")
         return mock_response(today_workout, history_28_days)
 
-    client = Groq(api_key=get_api_key())
+
+def _analyze_with_llm(today_workout: dict, history_28_days: list | None = None) -> str:
+    llm = ChatGroq(
+        model=LLM_MODEL,
+        groq_api_key=get_api_key(),
+    )
 
     prompt = build_prompt(today_workout, history_28_days)
 
     try:
-        response = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return response.choices[0].message.content
+        if LANGSMITH_ENABLED:
+            return _analyze_with_tracing(llm, prompt)
+        else:
+            response = llm.invoke(prompt)
+            return response.content
     except Exception as e:
         warn(f"LLM API call failed: {e}")
         raise
 
 
-def get_api_key() -> str:
-    import os
+@traceable(name="gym_workout_analysis")
+def _analyze_with_tracing(llm, prompt: str):
+    return llm.invoke(prompt)
 
+
+def get_api_key() -> str:
     provider = LLM_PROVIDER.lower()
     if provider == "groq":
         key = os.environ.get("GROQ_API_KEY")

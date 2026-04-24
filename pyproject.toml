@@ -12,6 +12,8 @@ dependencies = [
     "requests>=2.32.3",
     "psycopg2-binary>=2.9.9",
     "groq>=0.1.0",
+    "langchain-groq>=0.1.0",
+    "langsmith>=0.1.0",
 ]
 
 [project.optional-dependencies]
