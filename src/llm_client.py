@@ -2,7 +2,7 @@ import os
 
 if os.environ.get("LANGSMITH_ENABLED", "true").lower() in ("1", "true", "yes"):
     os.environ["LANGSMITH_TRACING"] = "true"
-    os.environ["LANGSMITH_PROJECT"] = os.environ.get("LANGSMITH_PROJECT", "gym-workout-analysis")
+    os.environ["LANGSMITH_PROJECT"] = os.environ.get("LANGSMITH_PROJECT", "Gym Workout Analysis")
 
 from langchain_groq import ChatGroq
 from langsmith import traceable
