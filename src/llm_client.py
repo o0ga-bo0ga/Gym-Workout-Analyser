@@ -40,7 +40,7 @@ def _analyze_with_llm(today_workout: dict, history_28_days: list | None = None) 
 
 @traceable(name="gym_workout_analysis")
 def _analyze_with_tracing(llm, prompt: str):
-    return llm.invoke(prompt)
+    return llm.invoke(prompt).content
 
 
 def get_api_key() -> str:
