@@ -16,6 +16,8 @@ LLM_MODEL: str = os.environ.get("LLM_MODEL", "llama-3.1-8b-instant")
 LLM_ENABLED: bool = LLM_PROVIDER == "groq"
 LLM_MOCK: bool = env_bool("LLM_MOCK", False)
 
+TONE: str = os.environ.get("TONE", "balanced").lower()
+
 # LangSmith config
 LANGSMITH_ENABLED: bool = env_bool("LANGSMITH_ENABLED", True)
 

@@ -1,3 +1,4 @@
+import json
 import os
 
 from config import (
@@ -6,10 +7,11 @@ from config import (
     DRY_RUN,
     LLM_PROVIDER,
     LYFTA_ENABLED,
+    TONE,
 )
 from data_fetch import fetch_today_workout
 from database import fetch_recent_workouts
-from discord_client import format_discord_message, send_discord_message
+from discord_client import format_discord_embed, send_discord_embed, send_discord_message
 from llm_client import analyze_workout
 from log import error, info, warn
 from models import Workout
@@ -48,11 +50,13 @@ def main() -> None:
             history_28_days = fetch_recent_workouts(days=28)
             info(f"{LLM_PROVIDER.upper()}: history workouts = {len(history_28_days)}")
 
-            analysis = analyze_workout(workout, history_28_days)
-            message = format_discord_message(analysis, workout)
-            send_discord_message(message)
+            analysis = analyze_workout(workout, history_28_days, tone=TONE)
+            info(f"TONE: {TONE}")
+
+            embed = format_discord_embed(analysis, workout)
+            send_discord_embed(embed)
             info("Discord report sent")
-            print(analysis)
+            print(json.dumps(analysis, indent=2))
         except Exception as e:
             warn(f"Analysis or Discord send failed: {e}")
             if not DRY_RUN:
