@@ -55,7 +55,12 @@ def get_api_key() -> str:
 
 
 def build_prompt(today_workout: dict, history_28_days: list | None = None) -> str:
-    history_text = history_28_days if history_28_days else "No prior workouts in the last 4 weeks."
+    if not history_28_days:
+        history_text = "No prior workouts in the last 4 weeks."
+    elif len(history_28_days) == 1:
+        history_text = "Only today's workout available. No prior workout history to compare against."
+    else:
+        history_text = history_28_days
 
     return f"""
 You are a strength training and hypertrophy coach.Following is my workout plan:
@@ -106,12 +111,13 @@ Constraints:
 - If you see any weird rep ranges, just know that I tried going to failure, because thats what I'm gonna do regardless of weight chosen, I'm gonna pursue failure on the end sets
 - Every workout will have the muscle worked in the title, that is, it will have upper, lower/legs, chest tri, back bi, arms shoulder, in the title. please look at that, see which workout i did and then analyse.
 - Keep the response under 1800 characters. This is very important as if it exceeds 2000 characters the discord messaging will fail.
+- If no prior workout history is provided, do NOT make claims about consistency or progression compared to previous workouts. Base your analysis only on today's workout data.
 
 
 Today's workout:
 {today_workout}
 
-Previous 4 weeks:
+Previous 4 weeks workout history:
 {history_text}
 
 Cover:
