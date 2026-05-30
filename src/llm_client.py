@@ -279,7 +279,6 @@ def build_prompt(today_workout: dict, history_28_days: list | None = None, tone:
     history_stats_summary = ""
     if history_28_days and len(history_28_days) >= 2:
         fatigue_warnings = _detect_fatigue(history_28_days)
-        latest_groups = _categorize_exercises(history_28_days[-1])
         all_volumes: dict[str, float] = {}
         for h in history_28_days:
             h_groups = _categorize_exercises(h)
