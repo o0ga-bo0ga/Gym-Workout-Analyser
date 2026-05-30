@@ -208,9 +208,11 @@ class TestGeminiClient:
         history = None
 
         result = mock_response(workout, history)
-        assert isinstance(result, str)
+        assert isinstance(result, dict)
         assert len(result) > 0
-        assert "Volume" in result
+        assert "progression" in result
+        assert "positives" in result
+        assert "next_session" in result
 
 
 class TestDataFetchEdgeCases:
