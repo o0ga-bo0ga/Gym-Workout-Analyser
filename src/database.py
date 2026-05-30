@@ -25,10 +25,7 @@ def _init_pool():
         raise RuntimeError("SUPABASE_DATABASE_URL not set")
 
     _connection_pool = pool.ThreadedConnectionPool(
-        minconn=MIN_CONN,
-        maxconn=MAX_CONN,
-        dsn=db_url,
-        sslmode='require'
+        minconn=MIN_CONN, maxconn=MAX_CONN, dsn=db_url, sslmode="require"
     )
     atexit.register(_close_pool)
 
@@ -79,11 +76,14 @@ def initialize_database():
 def save_rest_day(workout_date: str):
     with _get_connection() as con:
         with con.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
             INSERT INTO workouts (workout_date, is_rest_day)
             VALUES (%s, TRUE)
             ON CONFLICT (workout_date) DO NOTHING;
-            """, (workout_date,))
+            """,
+                (workout_date,),
+            )
         con.commit()
 
 
@@ -99,7 +99,8 @@ def save_workout(workout: dict) -> Workout:
 
     with _get_connection() as con:
         with con.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
             INSERT INTO workouts (
                 workout_date,
                 workout_id,
@@ -113,15 +114,17 @@ def save_workout(workout: dict) -> Workout:
             VALUES (%s, %s, %s, %s, %s, %s, %s, FALSE)
             ON CONFLICT (workout_date) DO NOTHING
             RETURNING workout_id, created_at;
-            """, (
-                workout_date_str,
-                workout.get("id"),
-                workout.get("title"),
-                workout.get("total_volume"),
-                exercise_count,
-                set_count,
-                Json(description)
-            ))
+            """,
+                (
+                    workout_date_str,
+                    workout.get("id"),
+                    workout.get("title"),
+                    workout.get("total_volume"),
+                    exercise_count,
+                    set_count,
+                    Json(description),
+                ),
+            )
             row = cur.fetchone()
         con.commit()
 
@@ -140,17 +143,21 @@ def save_workout(workout: dict) -> Workout:
 def enforce_data_retention(months: int = 12):
     with _get_connection() as con:
         with con.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 DELETE FROM workouts
                 WHERE workout_date < CURRENT_DATE - (%s || ' months')::interval;
-            """, (str(months),))
+            """,
+                (str(months),),
+            )
         con.commit()
 
 
 def fetch_recent_workouts(days: int = 28) -> list[Workout]:
     with _get_connection() as con:
         with con.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT
                     workout_date,
                     title,
@@ -163,7 +170,9 @@ def fetch_recent_workouts(days: int = 28) -> list[Workout]:
                     is_rest_day = FALSE
                     AND workout_date >= CURRENT_DATE - (%s || ' days')::interval
                 ORDER BY workout_date ASC;
-            """, (str(days),))
+            """,
+                (str(days),),
+            )
             rows = cur.fetchall()
 
     return [
@@ -183,7 +192,8 @@ def fetch_recent_workouts(days: int = 28) -> list[Workout]:
 def fetch_workout_summary(days: int = 21) -> WorkoutSummary:
     with _get_connection() as con:
         with con.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT
                     COUNT(*) AS total_days,
                     SUM(CASE WHEN is_rest_day = FALSE THEN 1 ELSE 0 END) AS workout_days,
@@ -194,7 +204,9 @@ def fetch_workout_summary(days: int = 21) -> WorkoutSummary:
                     COALESCE(AVG(set_count), 0) AS avg_sets
                 FROM workouts
                 WHERE workout_date >= CURRENT_DATE - (%s || ' days')::interval;
-            """, (str(days),))
+            """,
+                (str(days),),
+            )
             row = cur.fetchone()
 
     return WorkoutSummary(

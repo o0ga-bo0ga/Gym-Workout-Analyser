@@ -3,49 +3,102 @@ import os
 
 if os.environ.get("LANGSMITH_ENABLED", "true").lower() in ("1", "true", "yes"):
     os.environ["LANGSMITH_TRACING"] = "true"
-    os.environ["LANGSMITH_PROJECT"] = os.environ.get("LANGSMITH_PROJECT", "Gym Workout Analysis")
+    os.environ["LANGSMITH_PROJECT"] = os.environ.get(
+        "LANGSMITH_PROJECT", "Gym Workout Analysis"
+    )
 
 from langchain_groq import ChatGroq
 from langsmith import traceable
 
-from config import LANGSMITH_ENABLED, LLM_ENABLED, LLM_MOCK, LLM_MODEL, LLM_PROVIDER, TONE
+from config import (
+    LANGSMITH_ENABLED,
+    LLM_ENABLED,
+    LLM_MOCK,
+    LLM_MODEL,
+    LLM_PROVIDER,
+    TONE,
+)
 from log import info, warn
 
 MUSCLE_GROUPS = {
     "chest": [
-        "bench press", "incline bench", "decline bench", "chest press",
-        "cable fly", "pec deck", "dumbbell fly", "push up", "chest dip",
-        "incline dumbbell", "flat db", "cable standing fly",
+        "bench press",
+        "incline bench",
+        "decline bench",
+        "chest press",
+        "cable fly",
+        "pec deck",
+        "dumbbell fly",
+        "push up",
+        "chest dip",
+        "incline dumbbell",
+        "flat db",
+        "cable standing fly",
     ],
     "triceps": [
-        "tricep", "triceps", "pushdown", "overhead extension",
-        "skull crusher", "close grip bench", "tricep dip",
+        "tricep",
+        "triceps",
+        "pushdown",
+        "overhead extension",
+        "skull crusher",
+        "close grip bench",
+        "tricep dip",
     ],
     "back": [
-        "lat pulldown", "pull up", "barbell row", "dumbbell row",
-        "cable row", "seated row", "pullover", "deadlift",
-        "chin up", "single-arm cable row", "wide-grip cable row",
+        "lat pulldown",
+        "pull up",
+        "barbell row",
+        "dumbbell row",
+        "cable row",
+        "seated row",
+        "pullover",
+        "deadlift",
+        "chin up",
+        "single-arm cable row",
+        "wide-grip cable row",
         "cable lat pullover",
     ],
     "biceps": [
-        "bicep", "biceps", "curl", "hammer curl", "preacher curl",
-        "incline curl", "concentration curl", "reverse curl",
+        "bicep",
+        "biceps",
+        "curl",
+        "hammer curl",
+        "preacher curl",
+        "incline curl",
+        "concentration curl",
+        "reverse curl",
     ],
     "shoulders": [
-        "shoulder press", "overhead press", "lateral raise",
-        "front raise", "rear delt", "face pull", "upright row",
-        "seated db shoulder", "cable lateral raise",
+        "shoulder press",
+        "overhead press",
+        "lateral raise",
+        "front raise",
+        "rear delt",
+        "face pull",
+        "upright row",
+        "seated db shoulder",
+        "cable lateral raise",
     ],
     "legs": [
-        "squat", "leg press", "lunge", "leg extension", "leg curl",
-        "calf raise", "romanian deadlift", "bulgarian split",
-        "smith squat", "walking lunge", "seated leg curl",
+        "squat",
+        "leg press",
+        "lunge",
+        "leg extension",
+        "leg curl",
+        "calf raise",
+        "romanian deadlift",
+        "bulgarian split",
+        "smith squat",
+        "walking lunge",
+        "seated leg curl",
         "standing calf",
     ],
 }
 
 
-def analyze_workout(today_workout: dict, history_28_days: list | None = None, tone: str | None = None) -> dict:
+def analyze_workout(
+    today_workout: dict, history_28_days: list | None = None, tone: str | None = None
+) -> dict:
     effective_tone = tone or TONE
     if LLM_ENABLED and not LLM_MOCK:
         return _analyze_with_llm(today_workout, history_28_days, effective_tone)
@@ -54,7 +107,9 @@ def analyze_workout(today_workout: dict, history_28_days: list | None = None, to
         return mock_response(today_workout, history_28_days)
 
 
-def _analyze_with_llm(today_workout: dict, history_28_days: list | None = None, tone: str = "balanced") -> dict:
+def _analyze_with_llm(
+    today_workout: dict, history_28_days: list | None = None, tone: str = "balanced"
+) -> dict:
     llm = ChatGroq(
         model=LLM_MODEL,
         groq_api_key=get_api_key(),
@@ -89,7 +144,7 @@ def _parse_response(raw: str) -> dict:
             cleaned = cleaned.rsplit("```", 1)[0]
         return json.loads(cleaned)
     except json.JSONDecodeError:
-        warn(f"Failed to parse LLM JSON, returning raw text")
+        warn("Failed to parse LLM JSON, returning raw text")
         return {"raw_text": raw}
 
 
@@ -190,7 +245,9 @@ def _detect_fatigue(history: list) -> list[str]:
     if len(volumes) >= 3:
         recent = volumes[-3:]
         if recent[-1] < recent[-2] < recent[-3]:
-            pct_drop = ((recent[-2] - recent[-1]) / recent[-2]) * 100 if recent[-2] > 0 else 0
+            pct_drop = (
+                ((recent[-2] - recent[-1]) / recent[-2]) * 100 if recent[-2] > 0 else 0
+            )
             warnings.append(f"Volume dropped {pct_drop:.0f}% last 2 sessions")
 
     if len(top_sets) >= 3:
@@ -230,7 +287,9 @@ def get_api_key() -> str:
 
 def _format_workout(workout: dict) -> str:
     lines = []
-    lines.append(f"Date: {workout.get('workout_perform_date', workout.get('date', 'N/A'))}")
+    lines.append(
+        f"Date: {workout.get('workout_perform_date', workout.get('date', 'N/A'))}"
+    )
     lines.append(f"Title: {workout.get('title', 'N/A')}")
     lines.append(f"Total Volume: {workout.get('total_volume', 'N/A')} kg")
 
@@ -261,7 +320,9 @@ def _format_history(history: list) -> str:
     return "\n\n".join(_format_workout(h) for h in history)
 
 
-def build_prompt(today_workout: dict, history_28_days: list | None = None, tone: str = "balanced") -> str:
+def build_prompt(
+    today_workout: dict, history_28_days: list | None = None, tone: str = "balanced"
+) -> str:
     if not history_28_days:
         history_text = "No prior workouts in the last 4 weeks."
     elif len(history_28_days) == 1:
@@ -271,7 +332,6 @@ def build_prompt(today_workout: dict, history_28_days: list | None = None, tone:
 
     today_text = _format_workout(today_workout)
 
-    today_stats = _compute_stats(today_workout)
     today_groups = _categorize_exercises(today_workout)
 
     fatigue_warnings = []
@@ -284,7 +344,9 @@ def build_prompt(today_workout: dict, history_28_days: list | None = None, tone:
             h_groups = _categorize_exercises(h)
             h_stats = _compute_stats(h)
             for g in h_groups:
-                all_volumes[g] = all_volumes.get(g, 0) + h_stats["muscle_volumes"].get(g, 0)
+                all_volumes[g] = all_volumes.get(g, 0) + h_stats["muscle_volumes"].get(
+                    g, 0
+                )
         volume_dist = _compute_volume_distribution(all_volumes)
         history_stats_summary = f"Historical avg volume: {sum(h.get('total_volume', 0) for h in history_28_days) / len(history_28_days):.0f} kg"
     elif history_28_days and len(history_28_days) == 1:
@@ -293,7 +355,10 @@ def build_prompt(today_workout: dict, history_28_days: list | None = None, tone:
     tone_instruction = {
         "harsh": "Be brutally honest. Call out weak points directly. No sugarcoating. Push the user to do better.",
         "balanced": "Be direct but constructive. Acknowledge wins, but don't hesitate to point out issues.",
-    }.get(tone, "Be direct but constructive. Acknowledge wins, but don't hesitate to point out issues.")
+    }.get(
+        tone,
+        "Be direct but constructive. Acknowledge wins, but don't hesitate to point out issues.",
+    )
 
     exercise_coverage_text = ""
     if today_groups:

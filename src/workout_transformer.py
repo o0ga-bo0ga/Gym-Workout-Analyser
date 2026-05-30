@@ -17,10 +17,7 @@ def build_workout_description(workout):
             if weight is None or reps is None:
                 continue
 
-            sets_data.append({
-                "weight_kg": float(weight),
-                "reps": int(reps)
-            })
+            sets_data.append({"weight_kg": float(weight), "reps": int(reps)})
 
         if sets_data:
             description[name] = sets_data

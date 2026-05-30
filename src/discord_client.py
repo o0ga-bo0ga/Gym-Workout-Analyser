@@ -32,7 +32,12 @@ def send_discord_embed(embed: dict):
     resp.raise_for_status()
 
 
-@retry(max_attempts=3, backoff_factor=2, initial_delay=1, exceptions=(requests.RequestException, RuntimeError))
+@retry(
+    max_attempts=3,
+    backoff_factor=2,
+    initial_delay=1,
+    exceptions=(requests.RequestException, RuntimeError),
+)
 def send_discord_message_with_retry(text):
     webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
     if not webhook_url:
@@ -69,33 +74,51 @@ def format_discord_embed(analysis: dict, workout: dict) -> dict:
     fields = []
 
     progression = analysis.get("progression", "N/A")
-    fields.append({"name": "Progression", "value": _truncate(progression), "inline": False})
+    fields.append(
+        {"name": "Progression", "value": _truncate(progression), "inline": False}
+    )
 
     coverage = analysis.get("coverage", "")
     if coverage:
-        fields.append({"name": "Exercise Coverage", "value": _truncate(coverage), "inline": False})
+        fields.append(
+            {"name": "Exercise Coverage", "value": _truncate(coverage), "inline": False}
+        )
 
     fatigue = analysis.get("fatigue", "None detected.")
-    fields.append({"name": "Fatigue Signals", "value": _truncate(fatigue), "inline": False})
+    fields.append(
+        {"name": "Fatigue Signals", "value": _truncate(fatigue), "inline": False}
+    )
 
     vol_dist = analysis.get("volume_distribution", "")
     if vol_dist:
-        fields.append({"name": "Volume Distribution", "value": _truncate(vol_dist), "inline": False})
+        fields.append(
+            {
+                "name": "Volume Distribution",
+                "value": _truncate(vol_dist),
+                "inline": False,
+            }
+        )
 
     positives = analysis.get("positives", [])
     if positives:
         text = "\n".join(f"+ {p}" for p in positives)
-        fields.append({"name": "What Went Well", "value": _truncate(text), "inline": False})
+        fields.append(
+            {"name": "What Went Well", "value": _truncate(text), "inline": False}
+        )
 
     improvements = analysis.get("improvements", [])
     if improvements:
         text = "\n".join(f"- {i}" for i in improvements)
         fields.append({"name": "To Improve", "value": _truncate(text), "inline": False})
     else:
-        fields.append({"name": "To Improve", "value": "Nothing flagged.", "inline": False})
+        fields.append(
+            {"name": "To Improve", "value": "Nothing flagged.", "inline": False}
+        )
 
     next_session = analysis.get("next_session", "N/A")
-    fields.append({"name": "Next Session", "value": _truncate(next_session), "inline": False})
+    fields.append(
+        {"name": "Next Session", "value": _truncate(next_session), "inline": False}
+    )
 
     color = 0x57F287
     if improvements:

@@ -11,13 +11,19 @@ from config import (
 )
 from data_fetch import fetch_today_workout
 from database import fetch_recent_workouts
-from discord_client import format_discord_embed, send_discord_embed, send_discord_message
+from discord_client import (
+    format_discord_embed,
+    send_discord_embed,
+    send_discord_message,
+)
 from llm_client import analyze_workout
 from log import error, info, warn
 from models import Workout
 from persistence import persist_today_workout
 
-REST_DAY_MESSAGE: str = os.environ.get("REST_DAY_MESSAGE", "Rest day taken. Recovery is important!")
+REST_DAY_MESSAGE: str = os.environ.get(
+    "REST_DAY_MESSAGE", "Rest day taken. Recovery is important!"
+)
 
 
 def main() -> None:

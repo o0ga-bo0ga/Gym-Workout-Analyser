@@ -6,6 +6,7 @@ from typing import Optional
 @dataclass
 class WorkoutSet:
     """A single set: weight x reps."""
+
     weight_kg: float
     reps: int
 
@@ -13,6 +14,7 @@ class WorkoutSet:
 @dataclass
 class ExerciseDescription:
     """Description of an exercise with multiple sets."""
+
     name: str
     sets: list[WorkoutSet] = field(default_factory=list)
 
@@ -23,6 +25,7 @@ class ExerciseDescription:
 @dataclass
 class Workout:
     """A workout session."""
+
     workout_date: date
     title: str
     total_volume: int
@@ -47,6 +50,7 @@ class Workout:
 @dataclass
 class WorkoutSummary:
     """21-day workout summary."""
+
     total_days: int
     workout_days: int
     rest_days: int
@@ -59,6 +63,7 @@ class WorkoutSummary:
 @dataclass
 class RestDay:
     """A rest day record."""
+
     workout_date: date
     is_rest_day: bool = True
     created_at: Optional[datetime] = None
