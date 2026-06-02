@@ -73,6 +73,16 @@ def initialize_database():
         con.commit()
 
 
+def workout_exists_for_date(workout_date: str) -> bool:
+    with _get_connection() as con:
+        with con.cursor() as cur:
+            cur.execute(
+                "SELECT 1 FROM workouts WHERE workout_date = %s LIMIT 1",
+                (workout_date,),
+            )
+            return cur.fetchone() is not None
+
+
 def save_rest_day(workout_date: str):
     with _get_connection() as con:
         with con.cursor() as cur:

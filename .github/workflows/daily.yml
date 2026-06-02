@@ -4,6 +4,16 @@ on:
   schedule:
     - cron: "30 16 * * *"
   workflow_dispatch:
+    inputs:
+      backfill_date:
+        description: "Backfill a specific date (YYYY-MM-DD) instead of today"
+        required: false
+        type: string
+      skip_db_save:
+        description: "Skip database persistence (analysis + Discord only)"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   run:
@@ -27,5 +37,7 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           TONE: ${{ vars.TONE || 'balanced' }}
+          BACKFILL_DATE: ${{ inputs.backfill_date }}
+          SKIP_DB_SAVE: ${{ inputs.skip_db_save }}
         run: |
           python src/main.py

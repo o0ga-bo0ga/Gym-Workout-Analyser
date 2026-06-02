@@ -18,6 +18,10 @@ LLM_MOCK: bool = env_bool("LLM_MOCK", False)
 
 TONE: str = os.environ.get("TONE", "balanced").lower()
 
+# Backfill / rerun controls
+BACKFILL_DATE: str | None = os.environ.get("BACKFILL_DATE") or None
+SKIP_DB_SAVE: bool = env_bool("SKIP_DB_SAVE", False)
+
 # LangSmith config
 LANGSMITH_ENABLED: bool = env_bool("LANGSMITH_ENABLED", True)
 

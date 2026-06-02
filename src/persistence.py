@@ -12,20 +12,27 @@ from models import Workout
 
 
 def persist_today_workout(workout: dict | None) -> Workout | None:
+    return persist_workout_for_date(workout, date.today().isoformat())
+
+
+def persist_workout_for_date(
+    workout: dict | None, target_date: str
+) -> Workout | None:
     if DRY_RUN:
         info("DRY RUN: Skipping DB write")
         return None
 
     initialize_database()
-    today = date.today().isoformat()
 
     if workout is None:
-        save_rest_day(today)
-        info(f"PERSISTENCE: Rest day logged for {today}")
+        save_rest_day(target_date)
+        info(f"PERSISTENCE: Rest day logged for {target_date}")
         return None
 
-    saved_workout = save_workout(workout)
-    info(f"PERSISTENCE: Workout logged for {today}: {saved_workout.title}")
+    workout_for_save = dict(workout)
+    workout_for_save["workout_perform_date"] = f"{target_date} 00:00:00"
+    saved_workout = save_workout(workout_for_save)
+    info(f"PERSISTENCE: Workout logged for {target_date}: {saved_workout.title}")
 
     try:
         enforce_data_retention(months=12)
