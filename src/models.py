@@ -37,8 +37,10 @@ class Workout:
     created_at: Optional[datetime] = None
 
     def to_dict(self) -> dict:
+        date_str = self.workout_date.isoformat()
         return {
-            "date": self.workout_date.isoformat(),
+            "date": date_str,
+            "workout_perform_date": date_str,
             "title": self.title,
             "total_volume": self.total_volume,
             "exercise_count": self.exercise_count,

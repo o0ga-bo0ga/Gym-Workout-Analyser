@@ -56,10 +56,13 @@ def main() -> None:
             history_28_days = fetch_recent_workouts(days=28)
             info(f"{LLM_PROVIDER.upper()}: history workouts = {len(history_28_days)}")
 
-            analysis = analyze_workout(workout, history_28_days, tone=TONE)
+            workout_dict = workout.to_dict()
+            history_dicts = [w.to_dict() for w in history_28_days]
+
+            analysis = analyze_workout(workout_dict, history_dicts, tone=TONE)
             info(f"TONE: {TONE}")
 
-            embed = format_discord_embed(analysis, workout)
+            embed = format_discord_embed(analysis, workout_dict)
             send_discord_embed(embed)
             info("Discord report sent")
             print(json.dumps(analysis, indent=2))
