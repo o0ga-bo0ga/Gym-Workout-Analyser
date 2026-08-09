@@ -30,7 +30,7 @@ This pipeline does the boring stuff so you don't have to:
    │              │              │               │
    ▼              ▼              ▼               ▼
 You crush  →  Pipeline runs  →  Analyzes it   →  Intel in
-a workout     at 10PM          overnight       Discord
+a workout     at 12PM          same day        Discord
 ```
 
 **What you get:**
@@ -97,7 +97,7 @@ GROQ_API_KEY
 LANGSMITH_API_KEY     # optional
 ```
 
-**Done.** Pipeline runs automatically at **10PM IST** every night.
+**Done.** Pipeline runs automatically at **12PM IST** every day.
 
 ---
 
