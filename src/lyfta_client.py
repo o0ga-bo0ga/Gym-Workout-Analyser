@@ -38,30 +38,3 @@ def fetch_todays_workout(api_key):
         return latest
 
     return None
-
-
-@retry(
-    max_attempts=3,
-    backoff_factor=2,
-    initial_delay=2,
-    exceptions=(requests.RequestException,),
-)
-def fetch_workout_for_date(api_key: str, target_date: str) -> dict | None:
-    headers = {"Authorization": f"Bearer {api_key}"}
-
-    params = {"limit": 50, "page": 1}
-
-    resp = requests.get(
-        f"{BASE_URL}/api/v1/workouts", headers=headers, params=params, timeout=10
-    )
-
-    if resp.status_code != 200:
-        raise RuntimeError(f"Lyfta API failed {resp.status_code}: {resp.text}")
-
-    workouts = resp.json().get("workouts", [])
-
-    for w in workouts:
-        if w.get("workout_perform_date", "")[:10] == target_date:
-            return w
-
-    return None

@@ -18,9 +18,10 @@ LLM_MOCK: bool = env_bool("LLM_MOCK", False)
 
 TONE: str = os.environ.get("TONE", "balanced").lower()
 
-# Backfill / rerun controls
-BACKFILL_DATE: str | None = os.environ.get("BACKFILL_DATE") or None
-SKIP_DB_SAVE: bool = env_bool("SKIP_DB_SAVE", False)
+# History filtering for LLM analysis
+MATCH_POOL_DAYS: int = int(os.environ.get("MATCH_POOL_DAYS", "45"))
+SIMILAR_SESSION_COUNT: int = int(os.environ.get("SIMILAR_SESSION_COUNT", "3"))
+WEEKLY_WINDOW_DAYS: int = int(os.environ.get("WEEKLY_WINDOW_DAYS", "14"))
 
 # LangSmith config
 LANGSMITH_ENABLED: bool = env_bool("LANGSMITH_ENABLED", True)
